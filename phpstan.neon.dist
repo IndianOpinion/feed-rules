@@ -1,0 +1,9 @@
+parameters:
+    level: 8
+    paths:
+        - src
+        - feed-rules.php
+        - uninstall.php
+    bootstrapFiles:
+        - tests/stubs/wordpress.php
+        - tests/stubs/wp-cli.php

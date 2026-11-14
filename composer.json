@@ -1,0 +1,52 @@
+{
+    "name": "indianopinion/feed-rules",
+    "description": "Include and exclude rules, category, tag and author mapping for imported feed items, with a test screen over the last hundred items.",
+    "type": "wordpress-plugin",
+    "license": "MIT",
+    "keywords": ["wordpress", "feeds", "import", "rules", "filter", "unicode"],
+    "homepage": "https://github.com/IndianOpinion/feed-rules",
+    "support": {
+        "issues": "https://github.com/IndianOpinion/feed-rules/issues",
+        "email": "hello@indianopinion.org"
+    },
+    "authors": [
+        {
+            "name": "Indian Opinion",
+            "email": "hello@indianopinion.org"
+        }
+    ],
+    "require": {
+        "php": ">=8.1",
+        "ext-mbstring": "*",
+        "ext-pcre": "*"
+    },
+    "suggest": {
+        "ext-intl": "Unicode NFC normalisation of item text before matching."
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "phpstan/phpstan": "^2.1",
+        "squizlabs/php_codesniffer": "^3.10"
+    },
+    "autoload": {
+        "psr-4": {
+            "IndianOpinion\\FeedRules\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "IndianOpinion\\FeedRules\\Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "phpstan": "phpstan analyse --no-progress --memory-limit=1G",
+        "phpcs": "phpcs",
+        "check": ["@phpcs", "@phpstan", "@test"]
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}

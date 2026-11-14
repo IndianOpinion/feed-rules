@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<ruleset name="feed-rules">
+    <description>PSR-12 for feed-rules.</description>
+    <file>src</file>
+    <file>tests</file>
+    <file>examples</file>
+    <file>feed-rules.php</file>
+    <file>uninstall.php</file>
+    <exclude-pattern>tests/stubs/*</exclude-pattern>
+    <arg name="extensions" value="php"/>
+    <arg value="sp"/>
+    <rule ref="PSR12">
+        <exclude name="Generic.Files.LineLength"/>
+    </rule>
+    <rule ref="PSR1.Files.SideEffects">
+        <exclude-pattern>feed-rules.php</exclude-pattern>
+        <exclude-pattern>uninstall.php</exclude-pattern>
+        <exclude-pattern>examples/*</exclude-pattern>
+        <exclude-pattern>src/autoload.php</exclude-pattern>
+    </rule>
+    <rule ref="PSR1.Methods.CamelCapsMethodName">
+        <exclude-pattern>src/Cli/Command.php</exclude-pattern>
+    </rule>
+</ruleset>
