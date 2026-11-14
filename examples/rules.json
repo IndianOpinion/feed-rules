@@ -1,0 +1,75 @@
+{
+    "schema": 1,
+    "edit_version": 0,
+    "rules": [
+        {
+            "id": "r-trusted",
+            "name": "Always keep the wire service",
+            "state": "test",
+            "scope": "all",
+            "scope_values": [],
+            "conditions": [
+                {"type": "url_prefix", "field": "url", "negate": false, "prefixes": ["wire.example.com"]}
+            ],
+            "action": "keep",
+            "categories": [],
+            "category_mode": "append",
+            "tags": [],
+            "author": 0
+        },
+        {
+            "id": "r-noise",
+            "name": "Drop horoscopes and job listings",
+            "state": "test",
+            "scope": "all",
+            "scope_values": [],
+            "conditions": [
+                {
+                    "type": "keywords",
+                    "field": "title",
+                    "negate": false,
+                    "keywords": ["horoscope*", "job listing", "राशिफल"],
+                    "mode": "any",
+                    "whole_words": true,
+                    "case_sensitive": false,
+                    "accent_insensitive": false
+                }
+            ],
+            "action": "exclude",
+            "categories": [],
+            "category_mode": "append",
+            "tags": [],
+            "author": 0
+        },
+        {
+            "id": "r-sponsored",
+            "name": "Drop sponsored posts",
+            "state": "test",
+            "scope": "all",
+            "scope_values": [],
+            "conditions": [
+                {"type": "regex", "field": "title_body", "negate": false, "pattern": "/(paid|sponsored)\\s+(partnership|content)/i", "accent_insensitive": false}
+            ],
+            "action": "exclude",
+            "categories": [],
+            "category_mode": "append",
+            "tags": [],
+            "author": 0
+        },
+        {
+            "id": "r-jobs-path",
+            "name": "Drop the jobs section",
+            "state": "test",
+            "scope": "importers",
+            "scope_values": ["core-feed"],
+            "conditions": [
+                {"type": "url_prefix", "field": "url", "negate": false, "prefixes": ["example.com/jobs"]}
+            ],
+            "action": "exclude",
+            "categories": [],
+            "category_mode": "append",
+            "tags": [],
+            "author": 0
+        }
+    ]
+}
