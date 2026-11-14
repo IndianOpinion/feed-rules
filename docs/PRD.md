@@ -21,8 +21,8 @@ keyword list inside each importer, and that remedy has three failures.
   treats a vowel sign in Devanagari or Tamil as a word break, so a keyword
   in those scripts either never matches or matches inside other words.
 - Nobody can see what a rule will do before it is live. In production, one
-  over-broad pattern held 758 of the 763 items it touched in a single day,
-  and every item sampled from that set was a good article.
+  over-broad pattern once held almost every item of a day, and every item
+  sampled from that set was a good article.
 
 feed-rules puts the rules in one place, applies them to any importer
 through a small adapter interface, matches words correctly in any script,
@@ -654,8 +654,8 @@ The builder answers each in `docs/ARCHITECTURE.md`.
 Written as rules for the builder.
 
 1. Ship a new rule in a log-only state and look at what it would have done
-   to real items before it acts. One over-broad pattern held 758 of 763
-   items in a day, and all of them were good.
+   to real items before it acts. An over-broad pattern once held almost
+   every item of a day, and all of them were good.
 2. Never use `\b` for a word boundary. Define the boundary by Unicode
    letter, mark and number classes, or Indic scripts break.
 3. Normalise hosts before comparing them (`www.`, `m.`, `amp.`,
