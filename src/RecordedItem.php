@@ -33,10 +33,14 @@ final class RecordedItem
         $fields = is_array($data['fields'] ?? null) ? $data['fields'] : [];
         $decision = Decision::fromArray(is_array($data['decision'] ?? null) ? $data['decision'] : []);
         $str = static fn (mixed $v): string => is_scalar($v) ? (string) $v : '';
+        // The JSON keeps the full importer id and source key; the columns may be cut.
+        $importer = is_string($fields['importer'] ?? null) ? $fields['importer'] : $str($row['importer_id'] ?? '');
+        $sourceKey = is_string($fields['source_key'] ?? null) ? $fields['source_key'] : $str($row['source_key'] ?? '');
+        unset($fields['importer'], $fields['source_key']);
         return new self(
-            $str($row['importer_id'] ?? ''),
+            $importer,
             $str($row['url'] ?? ''),
-            $str($row['source_key'] ?? ''),
+            $sourceKey,
             is_numeric($row['seen_at'] ?? null) ? (int) $row['seen_at'] : 0,
             !empty($row['sampled']),
             $fields,

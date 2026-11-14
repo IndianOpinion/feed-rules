@@ -92,4 +92,21 @@ final class RecentStoreTest extends TestCase
         $this->settings->update(['recent_limit' => 20]);
         self::assertSame(10, $this->store->prune());
     }
+
+    /** A source key or importer id wider than its column is cut there and kept in full in the row data. */
+    public function testLongSourceKeyAndImporterRoundTrip(): void
+    {
+        $key = 'https://example.com/' . str_repeat('feed/', 60);
+        $importer = str_repeat('i', 50);
+        $this->engine->filter(['url' => 'https://example.com/a', 'title' => 'one', 'source_key' => $key], $importer);
+        $rows = $this->storage->latest(10, null, null);
+        self::assertSame(RecentStore::SOURCE_KEY_WIDTH, mb_strlen((string) $rows[0]['source_key']));
+        self::assertSame(RecentStore::IMPORTER_WIDTH, mb_strlen((string) $rows[0]['importer_id']));
+        $latest = $this->store->latest(10, $importer, $key);
+        self::assertCount(1, $latest);
+        self::assertSame($key, $latest[0]->sourceKey);
+        self::assertSame($importer, $latest[0]->importerId);
+        self::assertSame($key, $latest[0]->toItem()->sourceKey());
+        self::assertSame(1, $this->store->count($importer));
+    }
 }

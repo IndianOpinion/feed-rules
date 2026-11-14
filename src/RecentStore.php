@@ -12,6 +12,10 @@ use IndianOpinion\FeedRules\Store\RecentStorage;
  */
 final class RecentStore
 {
+    /** Widths of the importer id and source key columns, in characters. */
+    public const IMPORTER_WIDTH = 40;
+    public const SOURCE_KEY_WIDTH = 191;
+
     private bool $unavailable = false;
     private string $lastError = '';
 
@@ -39,12 +43,15 @@ final class RecentStore
             'tags' => $item->tags(),
             'published' => $item->published(),
             'guid' => $item->guid(),
+            // Full values: the columns below are cut to their widths.
+            'source_key' => $item->sourceKey(),
+            'importer' => $importerId,
         ];
         $row = [
-            'importer_id' => $importerId,
+            'importer_id' => self::column($importerId, self::IMPORTER_WIDTH),
             'url' => $item->url(),
             'url_hash' => sha1($item->url()),
-            'source_key' => $item->sourceKey(),
+            'source_key' => self::column($item->sourceKey(), self::SOURCE_KEY_WIDTH),
             'seen_at' => Clock::now(),
             'sampled' => $sampled ? 1 : 0,
             'data' => (string) json_encode(
@@ -54,7 +61,7 @@ final class RecentStore
         ];
         try {
             $this->storage->upsert($row);
-            $this->storage->prune($importerId, $this->settings->recentLimit());
+            $this->storage->prune($row['importer_id'], $this->settings->recentLimit());
         } catch (StoreUnavailableException $e) {
             $this->unavailable = true;
             $this->lastError = $e->getMessage();
@@ -72,7 +79,11 @@ final class RecentStore
     {
         return array_map(
             [RecordedItem::class, 'fromRow'],
-            $this->storage->latest($limit, $importerId, $sourceKey)
+            $this->storage->latest(
+                $limit,
+                $importerId === null ? null : self::column($importerId, self::IMPORTER_WIDTH),
+                $sourceKey === null ? null : self::column($sourceKey, self::SOURCE_KEY_WIDTH)
+            )
         );
     }
 
@@ -92,7 +103,7 @@ final class RecentStore
     {
         try {
             $this->storage->ensure();
-            return $this->storage->count($importerId);
+            return $this->storage->count($importerId === null ? null : self::column($importerId, self::IMPORTER_WIDTH));
         } catch (StoreUnavailableException) {
             return 0;
         }
@@ -111,6 +122,15 @@ final class RecentStore
             $this->lastError = $e->getMessage();
             return false;
         }
+    }
+
+    /**
+     * A value cut to a column width on a character boundary, so a long feed URL
+     * used as a source key cannot make the insert fail under strict SQL modes.
+     */
+    public static function column(string $value, int $width): string
+    {
+        return mb_strlen($value, 'UTF-8') > $width ? mb_substr($value, 0, $width, 'UTF-8') : $value;
     }
 
     public function lastError(): string
