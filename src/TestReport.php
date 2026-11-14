@@ -116,7 +116,7 @@ final class TestReport
      */
     private static function csvCell(string $value): string
     {
-        return $value !== '' && in_array($value[0], ['=', '+', '-', '@'], true) ? "'" . $value : $value;
+        return $value !== '' && in_array($value[0], ['=', '+', '-', '@', "\t", "\r"], true) ? "'" . $value : $value;
     }
 
     private static function termName(int $id, string $taxonomy): string

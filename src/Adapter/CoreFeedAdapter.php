@@ -233,6 +233,8 @@ final class CoreFeedAdapter implements Adapter
             }
         } finally {
             $dropped->save();
+            // Re-read before writing, so feeds saved by an operator during the run are not overwritten.
+            $this->settings->forget();
             $this->settings->update(['feed_status' => $status]);
             delete_transient(self::LOCK);
         }
@@ -370,7 +372,8 @@ final class CoreFeedAdapter implements Adapter
     {
         $found = get_posts([
             'post_type' => 'post',
-            'post_status' => 'any',
+            // 'any' leaves out trash: an item an editor trashed must not come back as a new draft.
+            'post_status' => ['publish', 'future', 'draft', 'pending', 'private', 'trash'],
             'meta_key' => self::META_URL_KEY,
             'meta_value' => $key,
             'fields' => 'ids',
