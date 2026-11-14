@@ -34,8 +34,8 @@ final class Text
     public static function normalise(string $html): string
     {
         $text = self::scrub($html);
-        $text = (string) preg_replace('#<(script|style)\b[^>]*>.*?</\1\s*>#isu', ' ', $text);
-        $text = (string) preg_replace('#</?(?:' . self::BLOCK_TAGS . ')\b[^>]*>#iu', ' ', $text);
+        $text = self::replace('#<(script|style)\b[^>]*>.*?</\1\s*>#isu', ' ', $text);
+        $text = self::replace('#</?(?:' . self::BLOCK_TAGS . ')\b[^>]*>#iu', ' ', $text);
         $text = strip_tags($text);
         for ($pass = 0; $pass < 3; $pass++) {
             $decoded = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
@@ -59,9 +59,19 @@ final class Text
                 $text = $nfc;
             }
         }
-        $text = (string) preg_replace('/' . self::INVISIBLE_CLASS . '/u', '', $text);
-        $text = (string) preg_replace('/' . self::SPACE_CLASS . '/u', ' ', $text);
+        $text = self::replace('/' . self::INVISIBLE_CLASS . '/u', '', $text);
+        $text = self::replace('/' . self::SPACE_CLASS . '/u', ' ', $text);
         return trim($text, ' ');
+    }
+
+    /**
+     * preg_replace() that keeps the input when PCRE fails (for example on its
+     * backtrack limit with a very large body), so a failure never empties a field.
+     */
+    private static function replace(string $pattern, string $replacement, string $text): string
+    {
+        $out = preg_replace($pattern, $replacement, $text);
+        return is_string($out) ? $out : $text;
     }
 
     /**

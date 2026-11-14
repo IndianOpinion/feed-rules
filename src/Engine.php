@@ -11,7 +11,8 @@ use IndianOpinion\FeedRules\Exception\InvalidItemException;
  *
  * Precedence for one item, in order:
  * 1. A live keep rule that matches keeps the item. Exclude rules and the
- *    include requirement are then not applied.
+ *    include requirement are then not applied. The same holds when a live
+ *    keep rule in scope is in error and none matched (fail open).
  * 2. The first live exclude rule that matches drops the item.
  * 3. When live include rules are in scope, one must match or the item is
  *    dropped ("no include rule matched"). An include rule in error waives
@@ -145,6 +146,7 @@ final class Engine
         $matched = [];
         $kept = true;
 
+        $keepErrored = false;
         foreach ($live(Rule::ACTION_KEEP) as $rule) {
             $result = $run->rule($rule);
             if ($result->isMatch()) {
@@ -152,8 +154,10 @@ final class Engine
                 $matched[] = $rule->id;
                 break;
             }
+            $keepErrored = $keepErrored || $result->isError();
         }
-        $forcedKeep = $matched !== [];
+        // A keep rule that could not run might have kept the item: fail open.
+        $forcedKeep = $matched !== [] || $keepErrored;
 
         if (!$forcedKeep) {
             foreach ($live(Rule::ACTION_EXCLUDE) as $rule) {

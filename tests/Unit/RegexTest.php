@@ -116,4 +116,26 @@ final class RegexTest extends TestCase
         self::assertIsString($error);
         self::assertSame(Rule::STATE_LIVE, self::rule('exclude', [self::re('/x/')])->state);
     }
+
+    /** Fail open: a keep rule in error does not let an exclude rule drop the item. */
+    public function testKeepRuleInErrorFailsOpen(): void
+    {
+        $limit = ini_get('pcre.backtrack_limit');
+        ini_set('pcre.backtrack_limit', '1000');
+        try {
+            $set = new RuleSet([
+                self::rule('exclude', [self::kw('ab')]),
+                self::rule('keep', [self::re('/(\w+\s?)*$/', 'title')]),
+            ]);
+            $decision = $this->engine->evaluate(
+                self::item(['title' => str_repeat('ab ', 5000) . '!']),
+                'test',
+                $set
+            );
+            self::assertTrue($decision->isKept());
+            self::assertCount(1, $decision->errors());
+        } finally {
+            ini_set('pcre.backtrack_limit', (string) $limit);
+        }
+    }
 }

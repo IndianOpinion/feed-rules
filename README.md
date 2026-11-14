@@ -92,7 +92,7 @@ WP-CLI: `wp feed-rules list`, `status`, `test <rule-id|all> [--limit] [--importe
 1. The importer passes an item to `feed_rules_filter_item`. The item needs a URL; title, body, source name, source key, author, categories, tags, published time and GUID are optional.
 2. Text is normalised once: scripts and styles removed, tags stripped with block boundaries kept as spaces, entities decoded up to three times, bad UTF-8 repaired, NFC applied, whitespace (including no-break and zero-width spaces) collapsed. The body is cut to the window.
 3. Rules run in list order, with this precedence:
-   - a live `keep` rule that matches keeps the item, whatever the exclude and include rules say;
+   - a live `keep` rule that matches keeps the item, whatever the exclude and include rules say (a keep rule in error also keeps it: every failure keeps the item);
    - otherwise the first live `exclude` rule that matches drops it;
    - otherwise, if any live `include` rule is in scope, one must match or the item is dropped with "no include rule matched";
    - `test` rules are evaluated for every item and recorded as "would drop", "would keep" or "would map";
