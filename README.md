@@ -131,3 +131,7 @@ No. The reference adapter creates drafts or pending posts. An editor publishes t
 ## Licence
 
 MIT. Copyright (c) 2026 Indian Opinion. See `LICENSE`.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
